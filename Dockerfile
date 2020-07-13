@@ -1,6 +1,6 @@
 ARG BASE=ruby:2.7.0
 
-FROM ruby:2.7.0 as base
+FROM ${BASE}
 
 RUN bundle config --global frozen 1
 RUN bundle config set without "development test"
@@ -8,16 +8,10 @@ RUN bundle config set without "development test"
 WORKDIR /app
 
 COPY Gemfile Gemfile.lock ./
-RUN bundle install && bundle clean --force
+RUN bundle install
 
-
-
-FROM ${BASE}
-
-COPY --from=base /usr/local/bundle/ /usr/local/bundle/
 COPY . .
 
-EXPOSE 3000
-EXPOSE 9393
+EXPOSE 4567
 
-CMD ["bundle", "exec", "puma", "-C", "puma.rb"]
+CMD ["bundle", "exec", "rackup", "--host", "0.0.0.0", "-p", "4567"]
